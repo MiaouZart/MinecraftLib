@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class client {
+public class profile {
 
 
     private String m_version ; //version de minecraft
@@ -17,7 +17,7 @@ public class client {
     //
     private String m_json;         //json de la version dl sur le site piston
 
-    public  client(String version , String path , String jsonUrl){
+    public profile(String version , String path , String jsonUrl){
         m_version = version;
         m_path =path;
         m_pathAssets = path+"/assets";
