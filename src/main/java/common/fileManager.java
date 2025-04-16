@@ -15,13 +15,13 @@ import java.util.zip.ZipInputStream;
 
 public class fileManager {
 
-    static String downloadText(String urlStr) throws IOException {
+    public static String downloadText(String urlStr) throws IOException {
         try (InputStream in = new URL(urlStr).openStream()) {
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
-    static void downloadFile(String urlStr, File output) throws IOException {
+    public static void downloadFile(String urlStr, File output) throws IOException {
         try (InputStream in = new URL(urlStr).openStream()) {
             Files.copy(in, output.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
