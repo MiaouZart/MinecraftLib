@@ -23,3 +23,6 @@ build/
 /Mc-file
 /logs
 /.idea
+compose.yaml
+.dockerignore
+README.Docker.md
