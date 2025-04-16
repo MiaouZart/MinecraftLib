@@ -37,6 +37,7 @@ public class profile {
 
     private  String m_classpath;
     private  List<String>  m_command;
+    private String m_mainClass;
 
     public profile(String version, String path) {
         m_version = version;
@@ -62,6 +63,9 @@ public class profile {
     protected void addToClassPathList(String path){
         if(path.isEmpty())return;
         m_classPathList.add(path);
+    }
+    protected void setmainClass(String main){
+        m_mainClass = main;
     }
 
 
@@ -97,6 +101,7 @@ public class profile {
             }
 
         }
+        m_mainClass = m_jsonVersion.getString("mainClass");
     }
 
     private void downloadClient() throws IOException {
@@ -144,7 +149,7 @@ public class profile {
         m_command.add("-Djava.library.path=" + m_pathNative);
         m_command.add("-cp");
         m_command.add(m_classpath);
-        m_command.add(m_jsonVersion.getString("mainClass"));
+        m_command.add(m_mainClass);
         m_command.add("--username");
         m_command.add(user.getUserName());
         m_command.add("--accessToken");

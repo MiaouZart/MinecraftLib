@@ -96,6 +96,7 @@ public class fabric extends profile {
                 }
             }
         }
+        setmainClass(m_jsonFabric.getString("mainClass"));
     }
 
     /**
