@@ -9,6 +9,9 @@ public class User {
 
     public User(String Name){
         m_userName = Name;
+        m_accessToken = "0";
+        m_uuid = "offline";
+        m_userType = "legacy";
     }
 
     public String getUserType() {

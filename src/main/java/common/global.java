@@ -14,4 +14,15 @@ public class global {
             return m_url;
         }
     }
+    public enum Auth{
+        authenticateEndpoint("https://authserver.mojang.com/authenticate");
+        private final String m_enpoint;
+        Auth(String enpoint){
+            m_enpoint =enpoint;
+        }
+        public String getM_enpoint(){
+            return m_enpoint;
+        }
+
+    }
 }
