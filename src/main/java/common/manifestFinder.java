@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static common.fileManager.downloadText;
-import static common.global.VersionAPI.VANILLA_MANIFEST;
 
 public class manifestFinder {
     /*
      *Find the correct jsonUrl for the given mc-version
      */
-    public static String findManifest(String version) throws IOException,IllegalArgumentException {
-        JSONObject minecraftManifest = new JSONObject(downloadText(VANILLA_MANIFEST.getUrl()));
+    public static String findManifest(String version, String API) throws IOException,IllegalArgumentException {
+        JSONObject minecraftManifest = new JSONObject(downloadText(API));
         JSONArray versions = minecraftManifest.getJSONArray("versions");
         for (int i = 0; i < versions.length(); i++) {
             JSONObject version_i = versions.getJSONObject(i);

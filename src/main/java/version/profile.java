@@ -1,6 +1,7 @@
 package version;
 
 import User.User;
+import common.global;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 import static common.fileManager.downloadFile;
 import static common.fileManager.downloadText;
+import static common.global.VersionAPI.VANILLA_MANIFEST;
 import static common.manifestFinder.findManifest;
 
 public class profile {
@@ -21,10 +23,10 @@ public class profile {
     private String m_version; //version de minecraft
 
     //gestion des fichier//
-    private String m_path;     //Path vers les fichier de la version
-    private String m_pathAssets;  //Path vers les assests de la version
-    private String m_pathNative;  //Path vers les Native
-    private String m_pathlibraries;    //Path vers les libraries
+    protected String m_path;     //Path vers les fichier de la version
+    protected String m_pathAssets;  //Path vers les assests de la version
+    protected String m_pathNative;  //Path vers les Native
+    protected String m_pathlibraries;    //Path vers les libraries
     //
     private String m_jsonUrl;         //url du json de la version dl sur le site piston
     private JSONObject m_jsonVersion; //Json object de la version
@@ -45,7 +47,7 @@ public class profile {
         m_classPathList = new ArrayList<String>();
         try {
             createDir();
-            m_jsonUrl = findManifest(version);
+            m_jsonUrl = findManifest(version, VANILLA_MANIFEST.getUrl());
             m_jsonVersion = new JSONObject(downloadText(m_jsonUrl));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -54,6 +56,12 @@ public class profile {
         System.out.println(m_jsonVersion.getString("mainClass"));
 
 
+    }
+
+
+    protected void addToClassPathList(String path){
+        if(path.isEmpty())return;
+        m_classPathList.add(path);
     }
 
 
@@ -68,8 +76,7 @@ public class profile {
         }
     }
 
-    private void downloadLib() throws IOException {
-
+    protected void downloadLib() throws IOException {
         JSONArray libraries = m_jsonVersion.getJSONArray("libraries");//on récup les libs du json
         for (int i = 0; i < libraries.length(); i++) {
             JSONObject lib = libraries.getJSONObject(i);//on récup la lib a l'indice i
@@ -131,7 +138,7 @@ public class profile {
 
     private void buildCommand(User user){
         m_classpath = String.join(File.pathSeparator, m_classPathList);//build des classpath
-        List<String> m_command = new ArrayList<>();
+        m_command = new ArrayList<>();
         m_command.add("java");
         m_command.add("-Xmx2G");
         m_command.add("-Djava.library.path=" + m_pathNative);
@@ -168,10 +175,12 @@ public class profile {
             downloadAssets();
             buildCommand(user);
             buildProcess();
+            m_mcProcess.start();
         } catch (IOException e) {
+            System.out.println("Probleme");
+
             throw new RuntimeException(e);
         }
     }
-
 
 }
