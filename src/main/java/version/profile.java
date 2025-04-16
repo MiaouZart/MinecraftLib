@@ -31,6 +31,7 @@ public class profile {
     private String m_assetIndex;
 
     private ArrayList<String> m_classPathList;
+    private ProcessBuilder m_mcProcess;
 
     private  String m_classpath;
     private  List<String>  m_command;
@@ -137,7 +138,6 @@ public class profile {
         m_command.add("-cp");
         m_command.add(m_classpath);
         m_command.add(m_jsonVersion.getString("mainClass"));
-
         m_command.add("--username");
         m_command.add(user.getUserName());
         m_command.add("--accessToken");
@@ -155,9 +155,23 @@ public class profile {
         m_command.add("--userType");
         m_command.add(user.getUserType());
 
-        //
     }
 
+    private void buildProcess(){
+        m_mcProcess =new ProcessBuilder(m_command).inheritIO();
+    }
+
+    public void StartProfile(User user){
+        try {
+            downloadLib();
+            downloadClient();
+            downloadAssets();
+            buildCommand(user);
+            buildProcess();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }
