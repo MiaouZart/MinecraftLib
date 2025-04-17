@@ -118,28 +118,33 @@ public class profile {
                     libFile.getParentFile().mkdirs();
                     downloadFile(url, libFile);
                 }
-
                 m_classPathList.add(libFile.getAbsolutePath());
             }
 
-            if (lib.getString("name").contains("natives")) {
-                JSONObject artifact = downloads.optJSONObject("artifact");
-                if (artifact != null) {
-                    String url = artifact.getString("url");
-                    String path = artifact.getString("path");
-                    String nativeName = new File(path).getName();
+            if (lib.has("natives")) {
+                JSONObject natives = lib.getJSONObject("natives");
+                if (natives.has(osKey)) {
+                    String nativeClassifier = natives.getString(osKey).replace("${arch}", System.getProperty("os.arch").contains("64") ? "64" : "32");
+                    String nativeKey = "natives-" + osKey;
 
-                    if (downloadedNativeNames.contains(nativeName)) continue;
+                    if (downloads.has("classifiers") && downloads.getJSONObject("classifiers").has(nativeKey)) {
+                        JSONObject nativeArtifact = downloads.getJSONObject("classifiers").getJSONObject(nativeKey);
+                        String url = nativeArtifact.getString("url");
+                        String path = nativeArtifact.getString("path");
+                        String nativeName = new File(path).getName();
 
-                    File nativeZip = new File(m_pathlibraries, path);
-                    if (!nativeZip.exists()) {
-                        System.out.println("🧬 Téléchargement native: " + path);
-                        nativeZip.getParentFile().mkdirs();
-                        downloadFile(url, nativeZip);
+                        if (downloadedNativeNames.contains(nativeName)) continue;
+
+                        File nativeZip = new File(m_pathlibraries, path);
+                        if (!nativeZip.exists()) {
+                            System.out.println("🧬 Téléchargement native: " + path);
+                            nativeZip.getParentFile().mkdirs();
+                            downloadFile(url, nativeZip);
+                        }
+
+                        extractZip(nativeZip, new File(m_pathNative));
+                        downloadedNativeNames.add(nativeName);
                     }
-
-                    extractZip(nativeZip, new File(m_pathNative));
-                    downloadedNativeNames.add(nativeName);
                 }
             }
         }
