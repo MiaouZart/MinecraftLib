@@ -27,7 +27,7 @@ public class fileManager {
         }
     }
 
-    static void extractZip(File zipFile, File destDir) throws IOException {
+    public static void extractZip(File zipFile, File destDir) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {

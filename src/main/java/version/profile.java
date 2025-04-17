@@ -12,8 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static common.fileManager.downloadFile;
-import static common.fileManager.downloadText;
+import static common.fileManager.*;
 import static common.global.VersionAPI.VANILLA_MANIFEST;
 import static common.manifestFinder.findManifest;
 
@@ -64,6 +63,10 @@ public class profile {
         if(path.isEmpty())return;
         m_classPathList.add(path);
     }
+    protected void removeToClassPathList(String path){
+        if(path.isEmpty()||!m_classPathList.contains(path))return;
+        m_classPathList.remove(path);
+    }
     protected void setmainClass(String main){
         m_mainClass = main;
     }
@@ -81,10 +84,28 @@ public class profile {
     }
 
     protected void downloadLib() throws IOException {
-        JSONArray libraries = m_jsonVersion.getJSONArray("libraries");//on récup les libs du json
+        JSONArray libraries = m_jsonVersion.getJSONArray("libraries");
+
+        String osName = System.getProperty("os.name").toLowerCase();
+        String osKey;
+        if (osName.contains("win")) {
+            osKey = "windows";
+        } else if (osName.contains("mac")) {
+            osKey = "osx";
+        } else {
+            osKey = "linux";
+        }
+
+        List<String> downloadedNativeNames = new ArrayList<>();
+
         for (int i = 0; i < libraries.length(); i++) {
-            JSONObject lib = libraries.getJSONObject(i);//on récup la lib a l'indice i
-            if (!lib.has("downloads")) continue;//si pas de dl dans le json alors on skip
+            JSONObject lib = libraries.getJSONObject(i);
+
+            if (lib.has("rules") && !isAllowedByRules(lib.getJSONArray("rules"), osKey)) {
+                continue;
+            }
+
+            if (!lib.has("downloads")) continue;
             JSONObject downloads = lib.getJSONObject("downloads");
 
             if (downloads.has("artifact")) {
@@ -97,10 +118,32 @@ public class profile {
                     libFile.getParentFile().mkdirs();
                     downloadFile(url, libFile);
                 }
+
                 m_classPathList.add(libFile.getAbsolutePath());
             }
 
+            if (lib.getString("name").contains("natives")) {
+                JSONObject artifact = downloads.optJSONObject("artifact");
+                if (artifact != null) {
+                    String url = artifact.getString("url");
+                    String path = artifact.getString("path");
+                    String nativeName = new File(path).getName();
+
+                    if (downloadedNativeNames.contains(nativeName)) continue;
+
+                    File nativeZip = new File(m_pathlibraries, path);
+                    if (!nativeZip.exists()) {
+                        System.out.println("🧬 Téléchargement native: " + path);
+                        nativeZip.getParentFile().mkdirs();
+                        downloadFile(url, nativeZip);
+                    }
+
+                    extractZip(nativeZip, new File(m_pathNative));
+                    downloadedNativeNames.add(nativeName);
+                }
+            }
         }
+
         m_mainClass = m_jsonVersion.getString("mainClass");
     }
 
@@ -145,7 +188,7 @@ public class profile {
         m_classpath = String.join(File.pathSeparator, m_classPathList);//build des classpath
         m_command = new ArrayList<>();
         m_command.add("java");
-        m_command.add("-Xmx2G");
+        m_command.add("-Xmx5G");
         m_command.add("-Djava.library.path=" + m_pathNative);
         m_command.add("-cp");
         m_command.add(m_classpath);
@@ -180,6 +223,7 @@ public class profile {
             downloadAssets();
             buildCommand(user);
             buildProcess();
+            System.out.println(m_mcProcess.command());
             m_mcProcess.start();
         } catch (IOException e) {
             System.out.println("Probleme");
@@ -187,5 +231,29 @@ public class profile {
             throw new RuntimeException(e);
         }
     }
+
+
+    private static boolean isAllowedByRules(JSONArray rules, String currentOS) {
+        boolean allowed = false;
+
+        for (int i = 0; i < rules.length(); i++) {
+            JSONObject rule = rules.getJSONObject(i);
+            String action = rule.getString("action");
+
+            if (rule.has("os")) {
+                JSONObject os = rule.getJSONObject("os");
+                String ruleOS = os.getString("name");
+                if (ruleOS.equals(currentOS)) {
+                    allowed = action.equals("allow");
+                }
+            } else {
+                // Règle générale sans spécificité d'OS
+                allowed = action.equals("allow");
+            }
+        }
+
+        return allowed;
+    }
+
 
 }
