@@ -4,9 +4,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Objects;
 
-import static common.fileManager.downloadText;
+import static common.FileManager.downloadText;
 
-public class manifestFinder {
+public class ManifestFinder {
     /*
      *Find the correct jsonUrl for the given mc-version
      */

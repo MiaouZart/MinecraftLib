@@ -8,17 +8,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static common.fileManager.downloadFile;
-import static common.fileManager.downloadText;
-import static common.global.VersionAPI.FABRIC_LOADER_API;
-import static common.manifestFinder.findManifest;
+import static common.FileManager.downloadFile;
+import static common.FileManager.downloadText;
+import static common.Global.VersionAPI.FABRIC_LOADER_API;
 
-public class fabric extends profile {
+public class Fabric extends Profile {
     private String m_jsonUrl;
     private JSONObject m_jsonFabric;
     private Map<String, String> m_libVersions = new HashMap<>();
 
-    public fabric(String version, String path, String fabricVersion) {
+    public Fabric(String version, String path, String fabricVersion) {
         super(version, path);
         try {
             m_jsonUrl = FABRIC_LOADER_API.getUrl() + version + "/" + fabricVersion + "/profile/json";

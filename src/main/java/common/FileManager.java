@@ -7,13 +7,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class fileManager {
+public class FileManager {
 
     public static String downloadText(String urlStr) throws IOException {
         try (InputStream in = new URL(urlStr).openStream()) {

@@ -1,7 +1,6 @@
 package version;
 
 import User.User;
-import common.global;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -12,11 +11,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static common.fileManager.*;
-import static common.global.VersionAPI.VANILLA_MANIFEST;
-import static common.manifestFinder.findManifest;
+import static common.FileManager.*;
+import static common.Global.VersionAPI.VANILLA_MANIFEST;
+import static common.ManifestFinder.findManifest;
 
-public class profile {
+public class Profile {
 
 
     private String m_version; //version de minecraft
@@ -38,7 +37,7 @@ public class profile {
     private  List<String>  m_command;
     private String m_mainClass;
 
-    public profile(String version, String path) {
+    public Profile(String version, String path) {
         m_version = version;
         m_path = path;
         m_pathAssets = path + "/assets";
